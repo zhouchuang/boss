@@ -12,7 +12,7 @@ class Demo(scrapy.spiders.Spider):
     name = "demo"
     allowed_domains = ["www.zhipin.com"]
     start_urls = [
-        "http://www.zhipin.com/job_detail/?query=大数据&scity=101280600&source=1",
+        "http://www.zhipin.com/job_detail/?query=前端&scity=101280600&source=1",
     ]
     url_set = set()
     url_over_set = set()
