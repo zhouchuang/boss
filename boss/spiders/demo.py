@@ -5,12 +5,14 @@ import hashlib
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
+from boss.items import BossItem
+
 
 class Demo(scrapy.spiders.Spider):
     name = "demo"
     allowed_domains = ["www.zhipin.com"]
     start_urls = [
-        "http://www.zhipin.com/job_detail/?query=Java&scity=101280600&source=1",
+        "http://www.zhipin.com/job_detail/?query=大数据&scity=101280600&source=1",
     ]
     url_set = set()
     url_over_set = set()
@@ -36,21 +38,16 @@ class Demo(scrapy.spiders.Spider):
             #获取数据
             items = hxs.xpath('//div[@class="job-list"]/ul/li')  # select中填写查询目标，按scrapy查询语法书写
             for item in items:
-                jobName = \
-                    item.xpath('./div[@class="job-primary"]/div[@class="info-primary"]/h3/a/text()').extract()[0];
-                salary = \
-                    item.xpath('./div[@class="job-primary"]/div[@class="info-primary"]/h3/a/span/text()').extract()[
-                        0];
-                companyName = \
-                    item.xpath('./div[@class="job-primary"]/div[@class="info-company"]//h3/a/text()').extract()[0];
-                city = item.xpath('./div[@class="job-primary"]/div[@class="info-primary"]/p/text()').extract()[0];
-                life = item.xpath('./div[@class="job-primary"]/div[@class="info-primary"]/p/text()').extract()[1];
-                education = item.xpath('./div[@class="job-primary"]/div[@class="info-primary"]/p/text()').extract()[
-                    2];
-                skill = item.xpath('./div[@class="job-tags"]/span/text()').extract();
-                time = item.xpath('./div[@class="job-time"]/span/text()').extract()[0];
-                print jobName, companyName, city, life, education, salary, "[" + ",".join(skill) + "]", time;
-
+                bossItem = BossItem()
+                bossItem['jobName'] = item.xpath('./div[@class="job-primary"]/div[@class="info-primary"]/h3/a/text()').extract()[0];
+                bossItem['salary'] = item.xpath('./div[@class="job-primary"]/div[@class="info-primary"]/h3/a/span/text()').extract()[ 0];
+                bossItem['companyName'] =item.xpath('./div[@class="job-primary"]/div[@class="info-company"]//h3/a/text()').extract()[0];
+                bossItem['city'] = item.xpath('./div[@class="job-primary"]/div[@class="info-primary"]/p/text()').extract()[0];
+                bossItem['life'] = item.xpath('./div[@class="job-primary"]/div[@class="info-primary"]/p/text()').extract()[1];
+                bossItem['education'] = item.xpath('./div[@class="job-primary"]/div[@class="info-primary"]/p/text()').extract()[2];
+                bossItem['skill'] = item.xpath('./div[@class="job-tags"]/span/text()').extract();
+                bossItem['time'] = item.xpath('./div[@class="job-time"]/span/text()').extract()[0];
+                yield bossItem
             #完了后获取地址
             page_url = hxs.select('//div[@class="page"]/a/@href').extract()
             for url in page_url:
